@@ -3,12 +3,16 @@ import {
   IAM,
   WalletProvider,
 } from 'iam-client-lib';
+import {
+  providers,
+  Signer,
+} from 'ethers';
 
 interface IIamContext {
   connecting: boolean;
   connected: boolean,
   did: string | undefined,
-  signer: unknown,
+  signer: providers.JsonRpcSigner | Signer | undefined,
   init: (walletProvider: WalletProvider) => Promise<void>
   logout: () => Promise<void>
 }
@@ -21,7 +25,7 @@ function useProvideIam() {
   const [connecting, setConnecting] = React.useState<boolean>(false);
   const [connected, setConnected] = React.useState<boolean>(false);
   const [did, setDid] = React.useState<string | undefined>();
-  const [signer, setSigner] = React.useState<unknown>();
+  const [signer, setSigner] = React.useState<providers.JsonRpcSigner | Signer | undefined>();
 
   async function init(walletProvider: WalletProvider) {
     setConnecting(true);
@@ -37,8 +41,7 @@ function useProvideIam() {
       setConnecting(false);
       setDid(initializationData.did);
       setSigner(iam.getSigner());
-    } catch (e) {
-      console.log(e);
+    } catch (e: unknown) {
       setConnecting(false);
     }
   }
